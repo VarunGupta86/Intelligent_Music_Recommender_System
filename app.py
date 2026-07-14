@@ -150,6 +150,31 @@ DARK_CSS = """
     .selector-meta  { color: #6b7280; font-size: 0.8rem; margin-top: 0.15rem; }
 
     div[data-testid="stMetricValue"] { color: #c084fc !important; }
+
+    /* ---- Mobile responsiveness ---- */
+    @media (max-width: 640px) {
+        .hero-title { font-size: 1.9rem !important; line-height: 1.15; }
+        .hero-sub   { font-size: 0.8rem !important; }
+
+        .academic-card { padding: 1.2rem 1rem !important; border-radius: 14px; }
+        .academic-title { font-size: 1.15rem !important; }
+
+        .grid-container { flex-direction: column !important; gap: 1.2rem !important; text-align: left !important; }
+
+        .block-container { padding: 1rem 0.75rem !important; }
+        [data-testid="stHorizontalBlock"] { flex-direction: column !important; }
+        [data-testid="column"] { width: 100% !important; flex: 1 1 100% !important; }
+
+        section[data-testid="stSidebar"] { padding: 0.5rem !important; }
+
+        .js-plotly-plot { width: 100% !important; }
+
+        button[kind="primary"], button[kind="secondary"] {
+            width: 100% !important;
+            padding: 0.65rem 1rem !important;
+            font-size: 0.85rem !important;
+        }
+    }
 </style>
 """
 
@@ -616,11 +641,11 @@ with tab_explore:
                                "instrumentalness", "liveness", "valence"] if f in df.columns]
 
     if unit_feats:
-        plot_df  = df[unit_feats].copy().apply(pd.to_numeric, errors="coerce").dropna()
+        plot_df  = df[unit_feats].apply(pd.to_numeric, errors="coerce")
         palette  = ["#c084fc", "#818cf8", "#38bdf8", "#34d399", "#fbbf24", "#fb923c", "#f472b6"]
         labels   = [f.capitalize() for f in unit_feats]
-        means    = [plot_df[f].mean() for f in unit_feats]
-        stds     = [plot_df[f].std()  for f in unit_feats]
+        means    = [plot_df[f].mean(skipna=True) for f in unit_feats]
+        stds     = [plot_df[f].std(skipna=True)  for f in unit_feats]
 
         fig_bar = go.Figure()
         for feat, mean, std, clr in zip(labels, means, stds, palette):
@@ -702,5 +727,5 @@ A content-based music recommendation engine using Spotify audio features and cos
 The recommender is trained on a combined global dataset drawn from multiple Spotify data sources, covering millions of tracks spanning Pop, Rock, Hip-Hop, Jazz, Electronic, Classical, Folk, Anime, Country, R&B, Indie, and many more genres. Data preparation merges, deduplicates, and standardises all sources into a single optimised CSV.
 
 ### Tech Stack
-`Python` · `Streamlit` · `scikit-learn` · `pandas` · `NumPy` · `Plotly`
+`Python` · `Streamlit` · `scikit-learn` · `pandas` · `NumPy` · `Plotly`· `pyarrow`
 """)
