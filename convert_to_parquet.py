@@ -24,14 +24,14 @@ FEATURE_DTYPES = {
 }
 CATEGORY_COLS = ["genre", "language", "region"]
 
-# These 7 features are bounded 0-1, so float16 (~3 decimal digits of
-# precision) loses nothing that matters for similarity scoring or display,
-# while halving their storage vs float32. loudness (dB) and tempo (BPM)
-# have wider ranges, so they stay float32 for safety.
-FLOAT16_SAFE_COLS = [
-    "danceability", "energy", "speechiness", "acousticness",
-    "instrumentalness", "liveness", "valence",
-]
+# NOTE: we intentionally do NOT downcast any feature columns to float16.
+# float16 was causing "Audio Feature Distributions" charts to render blank/
+# broken (many plotting libs mishandle float16 during histogram binning,
+# and Arrow/Parquet readers can round-trip float16 inconsistently).
+# All numeric features stay float32. Size is instead controlled purely via
+# Parquet's columnar layout + zstd max compression + category dtype for
+# the string columns, which is normally enough to take a 300+ MB CSV to
+# well under 100 MB without touching precision.
 
 if __name__ == "__main__":
     if not os.path.exists(CSV_PATH):
@@ -41,10 +41,6 @@ if __name__ == "__main__":
     print(f"Reading {CSV_PATH} ...")
     df = pd.read_csv(CSV_PATH, dtype=dtype_map)
 
-    for col in FLOAT16_SAFE_COLS:
-        if col in df.columns:
-            df[col] = df[col].astype("float16")
-
     print(f"Writing {PARQUET_PATH} (zstd compression) ...")
     df.to_parquet(PARQUET_PATH, index=False, compression="zstd", compression_level=19)
 
@@ -52,3 +48,10 @@ if __name__ == "__main__":
     pq_mb  = os.path.getsize(PARQUET_PATH) / 1e6
     print(f"Done. {csv_mb:.1f} MB CSV -> {pq_mb:.1f} MB Parquet "
           f"({len(df):,} rows).")
+
+    LIMIT_MB = 100
+    if pq_mb >= LIMIT_MB:
+        print(f"WARNING: Parquet file is {pq_mb:.1f} MB, at/over the "
+              f"{LIMIT_MB} MB target. Consider dropping unused columns, "
+              f"reducing string-column cardinality (category dtype), or "
+              f"splitting the dataset before committing it.")
