@@ -727,9 +727,5 @@ A content-based music recommendation engine using Spotify audio features and cos
 The recommender is trained on a combined global dataset drawn from multiple Spotify data sources, covering millions of tracks spanning Pop, Rock, Hip-Hop, Jazz, Electronic, Classical, Folk, Anime, Country, R&B, Indie, and many more genres. Data preparation merges, deduplicates, and standardises all sources into a single optimised CSV.
 
 ### Tech Stack
-`Python` · `Streamlit` · `scikit-learn` · `pandas` · `NumPy` · `Plotly`· `pyarrow`
-<<<<<<< HEAD
+`Python` · `Streamlit` · `scikit-learn` · `pandas` · `NumPy` · `Plotly`
 """)
-=======
-""")
->>>>>>> 1325cae929b18ac95a94a88752bc0394f358b045
