@@ -728,4 +728,8 @@ The recommender is trained on a combined global dataset drawn from multiple Spot
 
 ### Tech Stack
 `Python` · `Streamlit` · `scikit-learn` · `pandas` · `NumPy` · `Plotly`· `pyarrow`
+<<<<<<< HEAD
 """)
+=======
+""")
+>>>>>>> 1325cae929b18ac95a94a88752bc0394f358b045
